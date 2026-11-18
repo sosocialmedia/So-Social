@@ -44,9 +44,9 @@ export default function FeedShowcase() {
       aria-label="Instagram Feed Portfolio van SO SOCIAL"
       className="scroll-mt-20 md:scroll-mt-28 relative py-20 sm:py-28 md:py-32 bg-[#FAF9F5] border-y border-[#E2DFD8] overflow-hidden select-none"
     >
-      {/* Subtle warm organic ambient background glows */}
-      <div className="absolute top-1/2 left-0 -translate-y-1/2 w-96 h-96 bg-[#B19A78]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-20 right-10 w-96 h-96 bg-[#B19A78]/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Subtle warm organic ambient background glows (radial gradient without blur-3xl repaint cost) */}
+      <div className="absolute top-1/2 left-0 -translate-y-1/2 w-96 h-96 bg-[radial-gradient(circle,rgba(177,154,120,0.12)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute -bottom-20 right-10 w-96 h-96 bg-[radial-gradient(circle,rgba(177,154,120,0.12)_0%,transparent_70%)] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
@@ -58,7 +58,7 @@ export default function FeedShowcase() {
                 <div
                   key={feed.id}
                   style={{ zIndex: feed.zIndex }}
-                  className={`flex-shrink-0 transition-transform duration-500 ease-out ${feed.rotation} pointer-events-none cursor-default`}
+                  className={`flex-shrink-0 ${feed.rotation} pointer-events-none cursor-default [transform-style:preserve-3d] [backface-visibility:hidden]`}
                 >
                   {/* Smartphone App / Polaroid Style Card */}
                   <div className="w-[175px] sm:w-[215px] md:w-[235px] lg:w-[210px] xl:w-[230px] bg-white rounded-2xl sm:rounded-3xl p-2.5 sm:p-3 shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-[#E8E5DF]">
@@ -68,7 +68,8 @@ export default function FeedShowcase() {
                       <img
                         src={feed.image}
                         alt={`Instagram feed voor ${feed.client} door SO SOCIAL`}
-                        loading="lazy"
+                        loading="eager"
+                        decoding="async"
                         className="w-full h-full object-cover"
                       />
                     </div>

@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { motion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
 import { ServiceDetail } from '../data/servicesData';
 import { updatePageSeo } from '../utils/seo';
@@ -66,12 +65,7 @@ export default function ServicePage({ service, onNavigate, onOpenContact }: Serv
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
           {/* Left Column: Clean Editorial Intro */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
-            className="lg:col-span-7"
-          >
+          <div className="lg:col-span-7">
             <span className="text-[10px] sm:text-xs font-bold tracking-[0.3em] text-[#B19A78] uppercase block mb-4">
               DIENST
             </span>
@@ -88,40 +82,30 @@ export default function ServicePage({ service, onNavigate, onOpenContact }: Serv
               <p>{service.leadParagraph}</p>
               <p>{service.secondaryParagraph}</p>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right Column: Clean Editorial Photo */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.15, ease: 'easeOut' }}
-            className="lg:col-span-5"
-          >
+          <div className="lg:col-span-5">
             <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-xl border border-[#E2DFD8] bg-[#EAEAE6]">
               <img
                 src={service.image}
                 alt={service.imageAlt}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover [transform:translateZ(0)]"
                 loading="eager"
+                decoding="async"
               />
             </div>
-          </motion.div>
+          </div>
 
         </div>
       </section>
 
       {/* Dark Rounded Editorial CTA Card matching reference screenshot */}
       <section className="max-w-6xl mx-auto px-6 md:px-12">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="relative overflow-hidden rounded-[28px] sm:rounded-[36px] bg-[#24201B] px-8 py-20 sm:px-14 sm:py-28 text-center shadow-2xl"
-        >
+        <div className="relative overflow-hidden rounded-[28px] sm:rounded-[36px] bg-[#24201B] px-8 py-20 sm:px-14 sm:py-28 text-center shadow-2xl">
           {/* Soft warm glow in top-left corner matching reference */}
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#B19A78]/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[#B19A78]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-[radial-gradient(circle,rgba(177,154,120,0.22)_0%,transparent_70%)] pointer-events-none" />
+          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[radial-gradient(circle,rgba(177,154,120,0.12)_0%,transparent_70%)] pointer-events-none" />
 
           <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
             <span className="text-[10px] sm:text-[11px] font-medium tracking-[0.35em] uppercase text-[#B19A78] block mb-6">
@@ -144,7 +128,7 @@ export default function ServicePage({ service, onNavigate, onOpenContact }: Serv
               START PROJECT
             </button>
           </div>
-        </motion.div>
+        </div>
       </section>
 
     </article>

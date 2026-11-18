@@ -26,6 +26,12 @@ body {
   color: #1A1A1A;
 }
 
+/* Prevent image subpixel flickering during mobile & desktop scroll */
+img {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
 /* Continuous smooth sliding marquee for services ticker */
 @keyframes marquee {
   0% {

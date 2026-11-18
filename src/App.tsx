@@ -31,14 +31,10 @@ import {
   CheckCircle2
 } from 'lucide-react';
 
-// Import high-resolution generated editorial assets
-import img3610_3 from './assets/images/chinouk1.jpg';
-import chinoukLaptop from './assets/images/chinouk1.jpg';
+// Import optimized editorial assets
 import telefoonHand from './assets/images/telefoon_hand_1784023726772.jpg';
-import bahoizerLook from './assets/images/bahoizerlook.jpg';
 import laptopWerk from './assets/images/laptop_so_social_1790596744641.jpeg';
 import portfolioShoulder from './assets/images/portfolio_shoulder_1784023763265.jpg';
-import portfolioCrouching from './assets/images/portfolio_crouching_1784023774880.jpg';
 import portfolioLaughing from './assets/images/portfolio_laughing_1784023788862-1.jpeg';
 import grensulleLogo from './assets/images/grensulle-1.jpg';
 import heroWidescreen from './assets/images/hero.jpg';
@@ -49,7 +45,6 @@ import laptopSoSocial from './assets/images/laptop_sosocial_1784281847694.jpg';
 import heroCalmWorkspace from './assets/images/hero_calm_workspace_1784281822703.jpg';
 import schuyrenTech from './assets/images/schuyren_tech_1788530223929.JPG';
 import visitZuidLimburg from './assets/images/visit_zuid_limburg_1788530238514.jpg';
-import soSocialLogo from './assets/images/so_social_logo.svg';
 
 // Import SEO and Dedicated Subpages
 import { servicesData, generalFaqs } from './data/servicesData';
@@ -272,10 +267,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#EAEAE6] text-[#1A1A1A] font-sans selection:bg-[#1A1A1A] selection:text-[#EAEAE6] overflow-x-hidden">
+    <div className="min-h-screen bg-[#EAEAE6] text-[#1A1A1A] font-sans selection:bg-[#1A1A1A] selection:text-[#EAEAE6] overflow-x-clip">
       
       {/* Dynamic Header / Navigation with Diensten Dropdown */}
-      <nav id="main-navigation" className="fixed top-0 left-0 w-full z-40 px-4 sm:px-6 md:px-12 py-4 md:py-6 flex justify-between items-center transition-all duration-300 bg-[#EAEAE6]/85 backdrop-blur-md border-b border-black/5 shadow-xs">
+      <nav id="main-navigation" className="fixed top-0 left-0 w-full z-40 px-4 sm:px-6 md:px-12 py-4 md:py-6 flex justify-between items-center bg-[#EAEAE6]/95 border-b border-black/5 shadow-xs">
         
         {/* Brand Logo */}
         <button 
@@ -492,68 +487,46 @@ export default function App() {
             src={heroCalmWorkspace} 
             alt="SO SOCIAL - Modern & Minimalist Creative Studio Workspace" 
             referrerPolicy="no-referrer"
-            className="w-full h-full object-cover filter brightness-[0.97] contrast-[0.98]"
+            loading="eager"
+            decoding="sync"
+            fetchPriority="high"
+            className="w-full h-full object-cover brightness-[0.97] contrast-[0.98]"
           />
-          {/* Subtle warm, luxury gradient overlay to ensure perfect legibility of dark text */}
-          <div className="absolute inset-0 bg-[#EAEAE6]/15 backdrop-blur-[1px]" />
+          {/* Subtle warm overlay to ensure perfect legibility of dark text without backdrop-blur flicker */}
+          <div className="absolute inset-0 bg-[#EAEAE6]/20" />
         </div>
 
         {/* Content Layered on Top */}
         <div className="relative z-10 max-w-6xl w-full px-6 md:px-12 text-center flex flex-col items-center my-auto py-6">
           {/* Main Display Typography */}
-          <div className="overflow-hidden mb-3">
-            <motion.h1 
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-              className="font-serif text-[12vw] sm:text-[9vw] md:text-[8vw] lg:text-[7vw] font-bold tracking-tight text-[#1A1A1A] leading-[0.9] uppercase drop-shadow-sm"
-            >
+          <div className="mb-3">
+            <h1 className="font-serif text-[12vw] sm:text-[9vw] md:text-[8vw] lg:text-[7vw] font-bold tracking-tight text-[#1A1A1A] leading-[0.9] uppercase drop-shadow-sm">
               SO SOCIAL
-            </motion.h1>
+            </h1>
           </div>
 
           {/* Clean Subtitle Below SO SOCIAL (no background box) */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-5 md:mb-6"
-          >
+          <div className="mb-5 md:mb-6">
             <span className="text-[10px] sm:text-xs font-semibold tracking-[0.28em] sm:tracking-[0.42em] text-[#8F7959] uppercase">
               MARKETING & SOCIAL MEDIA BUREAU
             </span>
-          </motion.div>
+          </div>
 
           <div className="w-16 h-[2px] bg-[#B19A78] rounded-full mb-5 md:mb-6" />
 
-          <div className="mb-6 md:mb-8 max-w-3xl bg-white/80 backdrop-blur-md px-5 py-6 sm:px-8 sm:py-8 rounded-3xl border border-[#B19A78]/30 shadow-sm">
-            <div className="overflow-hidden mb-3">
-              <motion.p 
-                initial={{ y: "100%" }}
-                animate={{ y: 0 }}
-                transition={{ duration: 1.4, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-                className="font-sans text-xs sm:text-sm md:text-base font-bold tracking-[0.12em] text-[#1A1A1A] uppercase leading-relaxed max-w-2xl mx-auto"
-              >
+          <div className="mb-6 md:mb-8 max-w-3xl bg-white/85 px-5 py-6 sm:px-8 sm:py-8 rounded-3xl border border-[#B19A78]/30 shadow-sm">
+            <div className="mb-3">
+              <p className="font-sans text-xs sm:text-sm md:text-base font-bold tracking-[0.12em] text-[#1A1A1A] uppercase leading-relaxed max-w-2xl mx-auto">
                 Wij bouwen esthetische feeds, converterende campagnes & krachtige online herkenbaarheid
-              </motion.p>
+              </p>
             </div>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.85 }}
-              transition={{ duration: 1.4, delay: 0.3 }}
-              className="font-sans text-[11px] sm:text-xs md:text-sm font-light text-[#1A1A1A] mt-3 max-w-xl mx-auto leading-relaxed"
-            >
+            <p className="font-sans text-[11px] sm:text-xs md:text-sm font-light text-[#1A1A1A]/85 mt-3 max-w-xl mx-auto leading-relaxed">
               SO SOCIAL is de ultieme partner voor social media management, online & offline marketing en strategische PR, waarbij we resultaatgerichte campagnes combineren met herkenbare visuele esthetiek.
-            </motion.p>
+            </p>
           </div>
 
           {/* Primary Action Button */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col sm:flex-row items-center gap-4"
-          >
+          <div className="flex flex-col sm:flex-row items-center gap-4">
             <a 
               href="#services"
               className="inline-flex items-center gap-3 bg-[#B19A78] text-white hover:bg-[#9E8766] px-8 py-3.5 rounded-full text-xs font-bold tracking-widest uppercase transition-all shadow-lg hover:scale-102 cursor-pointer"
@@ -567,19 +540,14 @@ export default function App() {
             >
               Samenwerken
             </button>
-          </motion.div>
+          </div>
         </div>
       </header>
 
       {/* General Intro Section */}
       <section id="intro" className="scroll-mt-20 md:scroll-mt-28 py-24 md:py-32 px-6 md:px-12 bg-[#FAF9F5] flex items-center justify-center border-y border-[#E2DFD8]">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.9, ease: "easeOut" }}
-          >
+          <div>
             <span className="text-[10px] sm:text-xs font-bold tracking-[0.3em] text-[#B19A78] uppercase block mb-4">
               KLAAR OM JE TE ONDERSCHEIDEN?
             </span>
@@ -598,7 +566,7 @@ export default function App() {
                 Of je nu meer zichtbaarheid wilt voor je bedrijf of simpelweg je social media op de juiste manier wilt beheren, dit is hét moment om door te pakken.
               </p>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -623,13 +591,9 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-6 xl:gap-8">
             
             {/* Service 1: Social Media Management */}
-            <motion.div 
+            <div 
               id="service-card-1"
               onClick={() => navigate('/diensten/social-media-management')}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
               className="group flex flex-col h-full bg-white/80 rounded-2xl p-6 xl:p-8 border border-black/5 hover:shadow-xl hover:bg-white transition-all duration-500 cursor-pointer"
             >
               <div className="relative aspect-[3/4] rounded-xl overflow-hidden mb-6 bg-[#EAEAE6]">
@@ -637,9 +601,11 @@ export default function App() {
                   src={telefoonHand} 
                   alt="Social Media Management - telefoon in hand" 
                   referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-in-out"
+                  loading="eager"
+                  decoding="async"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-in-out [transform:translateZ(0)]"
                 />
-                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-sm">
+                <div className="absolute top-4 left-4 bg-white/95 p-2 rounded-lg shadow-sm">
                   <PhoneCall size={18} className="text-[#1A1A1A]" />
                 </div>
               </div>
@@ -650,16 +616,12 @@ export default function App() {
               <p className="text-sm md:text-base text-black/70 font-light leading-relaxed flex-grow">
                 Volledige ontzorging van jouw social media kanalen. Van een doordachte contentstrategie en esthetische grid-planning tot copywriting, publicatie en community engagement.
               </p>
-            </motion.div>
+            </div>
 
             {/* Service 2: Fotografie */}
-            <motion.div 
+            <div 
               id="service-card-2"
               onClick={() => navigate('/diensten/fotografie')}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
               className="group flex flex-col h-full bg-white/80 rounded-2xl p-6 xl:p-8 border border-black/5 hover:shadow-xl hover:bg-white transition-all duration-500 cursor-pointer"
             >
               <div className="relative aspect-[3/4] rounded-xl overflow-hidden mb-6 bg-[#EAEAE6]">
@@ -667,9 +629,11 @@ export default function App() {
                   src={businessCardSoSocial} 
                   alt="Fotografie - SO SOCIAL" 
                   referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-in-out"
+                  loading="eager"
+                  decoding="async"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-in-out [transform:translateZ(0)]"
                 />
-                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-sm">
+                <div className="absolute top-4 left-4 bg-white/95 p-2 rounded-lg shadow-sm">
                   <Camera size={18} className="text-[#1A1A1A]" />
                 </div>
               </div>
@@ -680,16 +644,12 @@ export default function App() {
               <p className="text-sm md:text-base text-black/70 font-light leading-relaxed flex-grow">
                 Scroll-stoppende beelden die de aandacht direct grijpen. Wij verzorgen professionele merkfotografie, sfeerbeelden, bedrijfs- en productfotografie die perfect aansluiten bij jouw huisstijl.
               </p>
-            </motion.div>
+            </div>
 
             {/* Service 3: Webdesign */}
-            <motion.div 
+            <div 
               id="service-card-3"
               onClick={() => navigate('/diensten/webdesign')}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
               className="group flex flex-col h-full bg-white/80 rounded-2xl p-6 xl:p-8 border border-black/5 hover:shadow-xl hover:bg-white transition-all duration-500 cursor-pointer"
             >
               <div className="relative aspect-[3/4] rounded-xl overflow-hidden mb-6 bg-[#EAEAE6]">
@@ -697,9 +657,11 @@ export default function App() {
                   src={laptopWerk} 
                   alt="Webdesign - SO SOCIAL" 
                   referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-in-out"
+                  loading="eager"
+                  decoding="async"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-in-out [transform:translateZ(0)]"
                 />
-                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-sm">
+                <div className="absolute top-4 left-4 bg-white/95 p-2 rounded-lg shadow-sm">
                   <Globe size={18} className="text-[#1A1A1A]" />
                 </div>
               </div>
@@ -710,16 +672,12 @@ export default function App() {
               <p className="text-sm md:text-base text-black/70 font-light leading-relaxed flex-grow">
                 Een op maat gemaakte, conversiegerichte website die jouw merkidentiteit ademt. Van doordacht maatwerk webdesign en snelle mobiele ontwikkeling tot betrouwbaar onderhoud en updates.
               </p>
-            </motion.div>
+            </div>
 
             {/* Service 4: Marketing Management */}
-            <motion.div 
+            <div 
               id="service-card-4"
               onClick={() => navigate('/diensten/marketing-management')}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, delay: 0.45, ease: "easeOut" }}
               className="group flex flex-col h-full bg-white/80 rounded-2xl p-6 xl:p-8 border border-black/5 hover:shadow-xl hover:bg-white transition-all duration-500 cursor-pointer"
             >
               <div className="relative aspect-[3/4] rounded-xl overflow-hidden mb-6 bg-[#EAEAE6]">
@@ -727,9 +685,11 @@ export default function App() {
                   src={laptopSoSocial} 
                   alt="Marketing Management - SO SOCIAL" 
                   referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-in-out"
+                  loading="eager"
+                  decoding="async"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-in-out [transform:translateZ(0)]"
                 />
-                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-sm">
+                <div className="absolute top-4 left-4 bg-white/95 p-2 rounded-lg shadow-sm">
                   <Layers size={18} className="text-[#1A1A1A]" />
                 </div>
               </div>
@@ -740,7 +700,7 @@ export default function App() {
               <p className="text-sm md:text-base text-black/70 font-light leading-relaxed flex-grow">
                 Wij zetten jouw onderneming, evenement of regio krachtig op de kaart. Met strategisch marketing management combineren we online campagnes, PR, city marketing en merkpositionering voor blijvende groei.
               </p>
-            </motion.div>
+            </div>
 
           </div>
 
@@ -751,7 +711,7 @@ export default function App() {
               onClick={() => setIsContactOpen(true)}
               className="inline-flex items-center gap-3 bg-[#1A1A1A] text-white px-8 py-4 rounded-full text-sm font-semibold tracking-widest uppercase hover:bg-black/90 hover:scale-102 transition-all shadow-lg cursor-pointer"
             >
-              Vraag vrijblijvend intake aan <Sparkles size={16} />
+              Vraag vrijblijvend intake aan <ArrowRight size={16} />
             </button>
           </div>
 
@@ -783,21 +743,19 @@ export default function App() {
           <div className="grid grid-cols-12 gap-6 md:gap-8">
             
             {/* Project 1: City marketing voor Kerkrade */}
-            <motion.div 
+            <div 
               id="portfolio-item-1"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-white"
+              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-zinc-900"
             >
               <img 
                 src={portfolioShoulder} 
                 alt="City Marketing Gemeente Kerkrade" 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover filter grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105"
+                loading="eager"
+                decoding="async"
+                className="w-full h-full object-cover grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105 [transform:translateZ(0)]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-all duration-500 group-hover:opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
               
               {/* Overlay details */}
               <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white flex flex-col gap-2">
@@ -807,24 +765,22 @@ export default function App() {
                   Strategische city marketing, online & offline activaties en herkenbare campagnes die lokale trots en stedelijke initiatieven opvallend op de kaart zetten.
                 </p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Project: Visit Zuid Limburg (City Marketing) */}
-            <motion.div 
+            <div 
               id="portfolio-item-visit-zuid-limburg"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-white"
+              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-zinc-900"
             >
               <img 
                 src={visitZuidLimburg} 
                 alt="City Marketing - Visit Zuid Limburg" 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover filter grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105"
+                loading="eager"
+                decoding="async"
+                className="w-full h-full object-cover grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105 [transform:translateZ(0)]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-all duration-500 group-hover:opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
               
               {/* Overlay details */}
               <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white flex flex-col gap-2">
@@ -834,24 +790,22 @@ export default function App() {
                   City marketing en PR voor events zoals de Valkenburgse Bokkenweken. Strategische campagnes en visuele beleving die regionale tradities en bezoekersstromen krachtig versterken.
                 </p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Project 2: Social media management voor kapster (Hair Boutique Salon M) */}
-            <motion.div 
+            <div 
               id="portfolio-item-2"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-white"
+              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-zinc-900"
             >
               <img 
                 src={hairBoutiqueStyle} 
                 alt="Social Media Management - Hair Boutique Salon M" 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover filter grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105"
+                loading="eager"
+                decoding="async"
+                className="w-full h-full object-cover grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105 [transform:translateZ(0)]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-all duration-500 group-hover:opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
               
               {/* Overlay details */}
               <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white flex flex-col gap-2">
@@ -861,24 +815,22 @@ export default function App() {
                   Cureren van een luxueuze, warme Instagram-feed. Door esthetische branding en scroll-stoppende Reels genereren we continu directe boekingen en organisch bereik.
                 </p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Project: Schuyren Installatietechniek (Social media management) */}
-            <motion.div 
+            <div 
               id="portfolio-item-schuyren"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-white"
+              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-zinc-900"
             >
               <img 
                 src={schuyrenTech} 
                 alt="Social Media Management - Schuyren Installatietechniek" 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover filter grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105"
+                loading="eager"
+                decoding="async"
+                className="w-full h-full object-cover grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105 [transform:translateZ(0)]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-all duration-500 group-hover:opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
               
               {/* Overlay details */}
               <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white flex flex-col gap-2">
@@ -888,24 +840,22 @@ export default function App() {
                   Duurzaam vakmanschap en innovatieve installaties vertaald naar een herkenbare, professionele social mediastrategie.
                 </p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Project 3: Social media management voor schilder en tegelwerk */}
-            <motion.div 
+            <div 
               id="portfolio-item-3"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-white"
+              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-zinc-900"
             >
               <img 
                 src={portfolioLaughing} 
                 alt="Social Media Management - On Point Schilder & Tegelwerk" 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover filter grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105"
+                loading="eager"
+                decoding="async"
+                className="w-full h-full object-cover grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105 [transform:translateZ(0)]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-all duration-500 group-hover:opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
               
               {/* Overlay details */}
               <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white flex flex-col gap-2">
@@ -915,24 +865,22 @@ export default function App() {
                   Het transformeren van puur vakmanschap naar een premium online portfolio. We brengen gerealiseerde projecten in beeld om hoogwaardige klanten aan te trekken.
                 </p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Project 4: CV de Grensülle Vols */}
-            <motion.div 
+            <div 
               id="portfolio-item-4"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-white"
+              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-zinc-900"
             >
               <img 
                 src={grensulleLogo} 
                 alt="CV de Grensülle Vols — Event PR & Poster Design" 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover filter grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105"
+                loading="eager"
+                decoding="async"
+                className="w-full h-full object-cover grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105 [transform:translateZ(0)]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-all duration-500 group-hover:opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
               
               {/* Overlay details */}
               <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white flex flex-col gap-2">
@@ -942,24 +890,22 @@ export default function App() {
                   Ontwerp van opvallende fysieke en digitale posters, flyers en social PR-campagnes die zorgen voor herkenbare en drukbezochte regio-evenementen.
                 </p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Project: Grand Café Jules (Social Media Management) */}
-            <motion.div 
+            <div 
               id="portfolio-item-jules"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-white"
+              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-zinc-900"
             >
               <img 
                 src="/assets/aistudio/WhatsApp_Image_2026-11-18_at_16.29.59_4c8e58d5.jpeg" 
                 alt="Social Media Management - Grand Café Jules" 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover filter grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105"
+                loading="eager"
+                decoding="async"
+                className="w-full h-full object-cover grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105 [transform:translateZ(0)]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-all duration-500 group-hover:opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
               
               {/* Overlay details */}
               <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white flex flex-col gap-2">
@@ -969,24 +915,22 @@ export default function App() {
                   Sfeervolle fotografie, warme culinaire storytelling en een consistente Instagram-feed die de gastvrijheid en ambiance van Grand Café Jules direct tot leven brengen.
                 </p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Project 5: Voetbalvereniging Rood Groen LVC'01 */}
-            <motion.div 
+            <div 
               id="portfolio-item-5"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-white"
+              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-zinc-900"
             >
               <img 
                 src={heroWidescreen} 
                 alt="Rood Groen LVC'01 — Social Media Partner" 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover filter grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105"
+                loading="eager"
+                decoding="async"
+                className="w-full h-full object-cover grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105 [transform:translateZ(0)]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-all duration-500 group-hover:opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
               
               {/* Overlay details */}
               <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white flex flex-col gap-2">
@@ -996,7 +940,7 @@ export default function App() {
                   Als trotse social media partner verzorgen en versterken we de online aanwezigheid van voetbalvereniging Rood Groen LVC'01 uit Vaals & Lemiers.
                 </p>
               </div>
-            </motion.div>
+            </div>
 
           </div>
         </div>
@@ -1004,9 +948,6 @@ export default function App() {
 
       {/* Testimonial / Review Section */}
       <section id="reviews" className="scroll-mt-20 md:scroll-mt-28 py-24 md:py-36 px-6 md:px-12 bg-white relative overflow-hidden">
-        {/* Subtle background decoration */}
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#EAEAE6]/50 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#EAEAE6]/15 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10">
           
@@ -1024,13 +965,7 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
             
             {/* Review 1: CV de Grensülle Vols */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="bg-[#EAEAE6]/20 rounded-3xl p-8 border border-black/5 flex flex-col justify-between hover:bg-[#EAEAE6]/35 transition-all duration-300"
-            >
+            <div className="bg-[#EAEAE6]/20 rounded-3xl p-8 border border-black/5 flex flex-col justify-between hover:bg-[#EAEAE6]/35 transition-colors duration-300">
               <div>
                 <div className="flex justify-end items-center mb-6">
                   <div className="flex gap-0.5">
@@ -1053,16 +988,10 @@ export default function App() {
                   Evenementen PR & Grafisch Ontwerp
                 </p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Review 2: On Point Schilder & Tegelwerk */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-[#EAEAE6]/20 rounded-3xl p-8 border border-black/5 flex flex-col justify-between hover:bg-[#EAEAE6]/35 transition-all duration-300"
-            >
+            <div className="bg-[#EAEAE6]/20 rounded-3xl p-8 border border-black/5 flex flex-col justify-between hover:bg-[#EAEAE6]/35 transition-colors duration-300">
               <div>
                 <div className="flex justify-end items-center mb-6">
                   <div className="flex gap-0.5">
@@ -1085,16 +1014,10 @@ export default function App() {
                   On Point Schilder & Tegelwerk
                 </p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Review 3: Hair Boutique Salon M */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-[#EAEAE6]/20 rounded-3xl p-8 border border-black/5 flex flex-col justify-between hover:bg-[#EAEAE6]/35 transition-all duration-300"
-            >
+            <div className="bg-[#EAEAE6]/20 rounded-3xl p-8 border border-black/5 flex flex-col justify-between hover:bg-[#EAEAE6]/35 transition-colors duration-300">
               <div>
                 <div className="flex justify-end items-center mb-6">
                   <div className="flex gap-0.5">
@@ -1117,16 +1040,10 @@ export default function App() {
                   Hair Boutique Salon M
                 </p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Review 4: Centrum Manager Raoul Deckers */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-[#EAEAE6]/20 rounded-3xl p-8 border border-black/5 flex flex-col justify-between hover:bg-[#EAEAE6]/35 transition-all duration-300"
-            >
+            <div className="bg-[#EAEAE6]/20 rounded-3xl p-8 border border-black/5 flex flex-col justify-between hover:bg-[#EAEAE6]/35 transition-colors duration-300">
               <div>
                 <div className="flex justify-end items-center mb-6">
                   <div className="flex gap-0.5">
@@ -1149,7 +1066,7 @@ export default function App() {
                   Centrum Manager
                 </p>
               </div>
-            </motion.div>
+            </div>
 
           </div>
 
@@ -1162,31 +1079,22 @@ export default function App() {
           
           {/* Left Column: Portrait */}
           <div className="md:col-span-5 flex justify-center md:justify-start">
-            <motion.div 
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="relative w-[280px] h-[370px] sm:w-[320px] sm:h-[420px] rounded-t-full overflow-hidden shadow-2xl border border-black/5 bg-[#EAEAE6]"
-            >
+            <div className="relative w-[280px] h-[370px] sm:w-[320px] sm:h-[420px] rounded-t-full overflow-hidden shadow-2xl border border-black/5 bg-[#EAEAE6]">
               <img 
                 src={lopen} 
                 alt="Chinouk Jacobi - Founder & Creative Director of SO SOCIAL" 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover"
+                loading="eager"
+                decoding="async"
+                className="w-full h-full object-cover [transform:translateZ(0)]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
-            </motion.div>
+            </div>
           </div>
 
           {/* Right Column: Narrative */}
           <div className="md:col-span-7 flex flex-col justify-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, delay: 0.1, ease: "easeOut" }}
-            >
+            <div>
               <span className="text-[10px] font-bold tracking-[0.3em] text-[#B19A78] uppercase block mb-3">CREATIEF DIRECTEUR</span>
               <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#1A1A1A] mb-6 leading-tight">
                 "Wij vangen de ware essentie van jouw merk in pure digitale esthetiek"
@@ -1194,10 +1102,10 @@ export default function App() {
               
               <div className="space-y-4 text-sm sm:text-base text-black/70 font-light leading-relaxed">
                 <p>
-                  Mijn naam is <strong>Chinouk Jacobi</strong>, de oprichter van SO SOCIAL (ook wel bekend als So Social Media). Sinds de oprichting in 2024 geloven we dat social media niet louter functioneel moet zijn; het is de belangrijkste digitale etalage van jouw merk en moet de bezoeker direct betoveren.
+                  Mijn naam is <strong>Chinouk Jacobi</strong>, de oprichter van SO SOCIAL. Sinds de oprichting in 2024 geloven we dat social media niet louter functioneel moet zijn; het is de belangrijkste digitale etalage van jouw merk en moet de bezoeker direct betoveren.
                 </p>
                 <p>
-                  Wij ontzorgen commerciële bedrijven, overheden en spraakmakende evenementen volledig. Of het nu gaat om strategische city marketing (waarbij we lokale trots, stedelijke initiatieven en campagnes online en offline vormgeven), het ontwerpen van opvallende posters en PR voor regio-events, of het cureren van een oogstrelende, consistente Instagram-feed voor alle ambitieuze ondernemingen; wij brengen visuele klasse samen met een resultaatgerichte digitale groeistrategie.
+                  Wij ontzorgen commerciële bedrijven, overheden en spraakmakende evenementen volledig. Of het nu gaat om strategische city marketing, het ontwerpen van opvallende posters en PR voor regio-events, of het cureren van een oogstrelende, consistente Instagram-feed voor alle ambitieuze ondernemingen; wij brengen visuele klasse samen met een resultaatgerichte digitale groeistrategie.
                 </p>
               </div>
 
@@ -1207,11 +1115,11 @@ export default function App() {
                   Chinouk Jacobi
                 </div>
                 <div className="text-[10px] font-bold tracking-widest uppercase text-black/50 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0" />
                   <span>Allround Marketing & Communicatie</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
 
         </div>
@@ -1222,9 +1130,6 @@ export default function App() {
 
       {/* Interactive Contact Footer */}
       <footer id="contact" className="scroll-mt-20 md:scroll-mt-28 min-h-[70vh] flex flex-col justify-between bg-[#111111] text-[#EAEAE6] px-6 py-12 md:px-12 md:py-20 relative overflow-hidden">
-        
-        {/* Subtle radial glow */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/2 rounded-full blur-3xl pointer-events-none" />
 
         {/* Top Branding Bar */}
         <div className="flex justify-between items-center border-b border-white/10 pb-8">
