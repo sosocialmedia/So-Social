@@ -6,6 +6,7 @@ import {
   Mail,
   ArrowRight,
   ChevronRight,
+  ChevronDown,
   Star,
   Check,
   X,
@@ -23,7 +24,11 @@ import {
   Share2,
   Bookmark,
   Grid,
-  TrendingUp
+  TrendingUp,
+  HelpCircle,
+  Menu,
+  Compass,
+  CheckCircle2
 } from 'lucide-react';
 
 // Import high-resolution generated editorial assets
@@ -46,6 +51,12 @@ import schuyrenTech from './assets/images/schuyren_tech_1788530223929.JPG';
 import visitZuidLimburg from './assets/images/visit_zuid_limburg_1788530238514.jpg';
 import soSocialLogo from './assets/images/so_social_logo.svg';
 
+// Import SEO and Dedicated Subpages
+import { servicesData, generalFaqs } from './data/servicesData';
+import ServicePage from './components/ServicePage';
+import FeedShowcase from './components/FeedShowcase';
+import { updatePageSeo } from './utils/seo';
+
 interface Submission {
   id: string;
   name: string;
@@ -60,10 +71,106 @@ export default function App() {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [selectedService, setSelectedService] = useState('Social Management');
+  const [selectedService, setSelectedService] = useState('Social Media Management');
+  const [formError, setFormError] = useState('');
   
-  // Interactive Growth Planner State
-  const [plannerGoal, setPlannerGoal] = useState('Esthetische Instagram Feed');
+  // Routing State
+  const [currentPath, setCurrentPath] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname;
+    }
+    return '/';
+  });
+  const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Client-side router navigation
+  const navigate = (path: string) => {
+    window.history.pushState(null, '', path);
+    setCurrentPath(path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIsServicesDropdownOpen(false);
+    setIsMobileMenuOpen(false);
+  };
+
+  // Listen to browser forward/back buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Update homepage SEO whenever on "/"
+  useEffect(() => {
+    if (currentPath === '/' || currentPath === '') {
+      updatePageSeo({
+        title: 'SO SOCIAL | Social Media, Online Marketing & Webdesign',
+        description: 'SO SOCIAL helpt bedrijven groeien met professioneel socialmediabeheer, contentcreatie, online advertenties, webdesign en het bouwen van professionele websites.',
+        canonicalUrl: 'https://so-socialmedia.nl/',
+        jsonLd: {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": ["Organization", "ProfessionalService"],
+              "@id": "https://so-socialmedia.nl/#organization",
+              "name": "SO SOCIAL",
+              "alternateName": [
+                "SO SOCIAL Nederland",
+                "sosocial",
+                "SoSocial",
+                "So Social Media"
+              ],
+              "url": "https://so-socialmedia.nl",
+              "logo": "https://so-socialmedia.nl/so_social_logo.svg",
+              "email": "so.socialmedia@outlook.com",
+              "founder": {
+                "@type": "Person",
+                "name": "Chinouk Jacobi",
+                "jobTitle": "Oprichter & Creatief Directeur"
+              },
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Vaals & Kerkrade",
+                "addressRegion": "Limburg",
+                "addressCountry": "NL"
+              },
+              "areaServed": [
+                {
+                  "@type": "Country",
+                  "name": "Nederland"
+                }
+              ],
+              "sameAs": [
+                "https://www.instagram.com/so.social.media",
+                "https://www.facebook.com/sosocialchinouk/"
+              ],
+              "description": "SO SOCIAL (ook bekend als sosocial of SO SOCIAL Nederland) is een professioneel bureau dat bedrijven helpt met hun complete online aanwezigheid en groei. Gespecialiseerd in socialmediabeheer, socialmediamarketing, contentcreatie, socialmedia-advertenties en maatwerk webdesign."
+            },
+            {
+              "@type": "FAQPage",
+              "@id": "https://so-socialmedia.nl/#faq",
+              "mainEntity": generalFaqs.map(faq => ({
+                "@type": "Question",
+                "name": faq.question,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": faq.answer
+                }
+              }))
+            }
+          ]
+        }
+      });
+    }
+  }, [currentPath]);
+
+  // Determine active route
+  const isServiceRoute = currentPath.startsWith('/diensten/');
+  const currentServiceSlug = isServiceRoute ? currentPath.replace('/diensten/', '').replace(/\/$/, '') : '';
+  const activeService = isServiceRoute ? servicesData[currentServiceSlug] : null;
+
   
   // Form State
   const [formName, setFormName] = useState('');
@@ -85,12 +192,13 @@ export default function App() {
     }
   }, []);
 
-  // Handle Form Submit
+  // Handle Form Submit via Web3Forms
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName || !formEmail) return;
 
     setIsSubmitting(true);
+    setFormError('');
 
     const newSubmission: Submission = {
       id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 9),
@@ -108,37 +216,37 @@ export default function App() {
     };
 
     try {
-      const response = await fetch("https://formsubmit.co/ajax/so.socialmedia@outlook.com", {
+      const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
         body: JSON.stringify({
-          _subject: `Nieuwe aanvraag via de website van SO SOCIAL!`,
-          "Naam": formName,
-          "E-mailadres": formEmail,
+          access_key: "33d9849f-16f7-427e-b0bd-5ff020aaf4f4",
+          subject: `Nieuwe aanvraag via de website van SO SOCIAL!`,
+          from_name: "SO SOCIAL Website",
+          name: formName,
+          email: formEmail,
+          replyto: formEmail,
           "Bedrijfsnaam / Event": formCompany || 'Persoonlijk',
           "Gewenste Dienst": selectedService,
-          "Vertel ons over je project": formMessage || 'Geen bericht achtergelaten',
-          _replyto: formEmail,
-          _template: "table"
+          message: formMessage || 'Geen bericht achtergelaten'
         })
       });
 
-      if (!response.ok) {
-        throw new Error("Mislukt om formulier te verzenden via FormSubmit");
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Mislukt om formulier te verzenden");
       }
-    } catch (error) {
-      console.error("FormSubmit Error:", error);
-    } finally {
+
       const updated = [newSubmission, ...submissions];
       setSubmissions(updated);
       localStorage.setItem('so_social_inquiries', JSON.stringify(updated));
 
-      setIsSubmitting(false);
       setIsSubmitted(true);
-      
+
       setTimeout(() => {
         setIsSubmitted(false);
         setIsContactOpen(false);
@@ -148,6 +256,11 @@ export default function App() {
         setFormCompany('');
         setFormMessage('');
       }, 3500);
+    } catch (error) {
+      console.error("Web3Forms Error:", error);
+      setFormError("Er ging iets mis bij het versturen. Probeer het opnieuw of mail direct naar so.socialmedia@outlook.com.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -161,38 +274,217 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#EAEAE6] text-[#1A1A1A] font-sans selection:bg-[#1A1A1A] selection:text-[#EAEAE6] overflow-x-hidden">
       
-      {/* Dynamic Header / Navigation */}
-      <nav id="main-navigation" className="fixed top-0 left-0 w-full z-40 px-4 sm:px-6 md:px-12 py-4 md:py-8 flex justify-between items-center transition-all duration-300 bg-[#EAEAE6]/80 backdrop-blur-md border-b border-black/5">
-        <a href="#" className="flex items-center group hover:opacity-85 transition-opacity" title="SO SOCIAL">
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden border border-black/10 shadow-sm flex-shrink-0 bg-[#E6E4DD]">
-            <img src={soSocialLogo} alt="SO SOCIAL" className="w-full h-full object-contain" />
+      {/* Dynamic Header / Navigation with Diensten Dropdown */}
+      <nav id="main-navigation" className="fixed top-0 left-0 w-full z-40 px-4 sm:px-6 md:px-12 py-4 md:py-6 flex justify-between items-center transition-all duration-300 bg-[#EAEAE6]/85 backdrop-blur-md border-b border-black/5 shadow-xs">
+        
+        {/* Brand Logo */}
+        <button 
+          onClick={() => navigate('/')} 
+          className="flex items-center group text-left cursor-pointer"
+          title="SO SOCIAL - Home"
+        >
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden border border-[#B19A78]/40 shadow-sm flex-shrink-0 bg-[#B19A78] group-hover:scale-105 transition-transform flex items-center justify-center">
+            <img src="/assets/aistudio/download_45d5e3ee.png" alt="SO SOCIAL" className="w-full h-full object-cover translate-y-[8%] scale-[2.2]" />
           </div>
-        </a>
-        <div className="flex items-center gap-3 sm:gap-6 md:gap-10">
-          <a href="#services" className="text-[9px] sm:text-[10px] md:text-xs font-semibold tracking-[0.15em] sm:tracking-[0.2em] uppercase hover:text-black/60 transition-colors whitespace-nowrap">
-            Diensten
-          </a>
-          <a href="#portfolio" className="text-[9px] sm:text-[10px] md:text-xs font-semibold tracking-[0.15em] sm:tracking-[0.2em] uppercase hover:text-black/60 transition-colors whitespace-nowrap">
+        </button>
+
+        {/* Desktop Menu */}
+        <div className="hidden md:flex items-center gap-7 lg:gap-10">
+          
+          {isServiceRoute && (
+            <button 
+              onClick={() => navigate('/')} 
+              className="text-xs font-light tracking-[0.18em] uppercase text-zinc-700 hover:text-black transition-colors cursor-pointer"
+            >
+              Home
+            </button>
+          )}
+
+          {/* Diensten Dropdown Menu */}
+          <div 
+            className="relative"
+            onMouseEnter={() => setIsServicesDropdownOpen(true)}
+            onMouseLeave={() => setIsServicesDropdownOpen(false)}
+          >
+            <button 
+              onClick={() => {
+                if (currentPath !== '/') {
+                  navigate('/');
+                  setTimeout(() => {
+                    document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                } else {
+                  document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className={`inline-flex items-center gap-1.5 text-xs font-light tracking-[0.18em] uppercase hover:text-black transition-colors cursor-pointer ${
+                isServiceRoute ? 'text-black border-b border-black pb-0.5' : 'text-zinc-700'
+              }`}
+            >
+              <span>Diensten</span>
+              <ChevronDown size={13} strokeWidth={1.5} className={`transition-transform duration-200 ${isServicesDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Dropdown Panel */}
+            <AnimatePresence>
+              {isServicesDropdownOpen && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  transition={{ duration: 0.18 }}
+                  className="absolute top-full left-1/2 -translate-x-1/2 w-80 bg-white rounded-2xl shadow-2xl border border-zinc-200 p-3 mt-2 z-50"
+                >
+                  <div className="px-3 py-2 border-b border-zinc-100 mb-1.5">
+                    <span className="text-[10px] font-bold tracking-[0.2em] text-[#B19A78] uppercase">
+                      Onze Diensten
+                    </span>
+                  </div>
+
+                  <div className="space-y-0.5">
+                    {Object.values(servicesData).map((svc) => (
+                      <button
+                        key={svc.slug}
+                        onClick={() => navigate(svc.path)}
+                        className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between group transition-colors cursor-pointer ${
+                          currentPath === svc.path ? 'bg-zinc-100 text-zinc-950 font-medium' : 'text-zinc-700 hover:bg-zinc-50'
+                        }`}
+                      >
+                        <div>
+                          <div className="font-normal group-hover:text-zinc-950">{svc.title}</div>
+                          <div className="text-[10px] text-zinc-400 group-hover:text-zinc-500 truncate max-w-[210px]">{svc.subtitle}</div>
+                        </div>
+                        <ArrowRight size={13} className="opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all text-[#B19A78]" />
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Portfolio Anchor Link */}
+          <button 
+            onClick={() => {
+              if (currentPath !== '/') {
+                navigate('/');
+                setTimeout(() => {
+                  document.getElementById('feeds-showcase')?.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              } else {
+                document.getElementById('feeds-showcase')?.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+            className="text-xs font-light tracking-[0.18em] uppercase text-zinc-700 hover:text-black transition-colors cursor-pointer"
+          >
             Portfolio
-          </a>
+          </button>
+
           <button 
             onClick={() => setIsContactOpen(true)}
-            className="text-[9px] sm:text-[10px] md:text-xs font-semibold tracking-[0.15em] sm:tracking-[0.2em] uppercase hover:text-black/60 transition-colors cursor-pointer whitespace-nowrap"
+            className="text-xs font-light tracking-[0.18em] uppercase text-zinc-700 hover:text-black transition-colors cursor-pointer"
           >
             Contact
           </button>
-          
-          {/* Subtle CTA button for Desktop */}
+        </div>
+
+        {/* Mobile Hamburger Button */}
+        <div className="flex items-center gap-2 md:hidden">
           <button
             onClick={() => setIsContactOpen(true)}
-            className="hidden md:inline-flex items-center gap-2 bg-[#1A1A1A] text-[#EAEAE6] px-5 py-2.5 rounded-full text-xs font-medium tracking-wider uppercase hover:bg-black/85 transition-colors cursor-pointer"
+            className="bg-[#1A1A1A] text-[#EAEAE6] px-3 py-1.5 rounded-full text-[10px] font-light tracking-wider uppercase"
           >
-            Start Project <ChevronRight size={14} />
+            Contact
+          </button>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 rounded-xl bg-white/70 border border-black/10 text-zinc-800"
+            aria-label="Toggle navigation menu"
+          >
+            {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </nav>
 
-      {/* Hero Section - Full screen Background Photo */}
+      {/* Mobile Drawer Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-16 left-0 right-0 z-30 bg-[#EAEAE6] border-b border-black/10 p-6 shadow-2xl md:hidden max-h-[85vh] overflow-y-auto"
+          >
+            <div className="space-y-4">
+              {isServiceRoute && (
+                <button
+                  onClick={() => navigate('/')}
+                  className="w-full text-left font-serif text-xl font-normal text-zinc-900 border-b border-black/5 pb-2"
+                >
+                  Home
+                </button>
+              )}
+
+              <div>
+                <p className="text-[10px] font-medium tracking-[0.2em] text-[#B19A78] uppercase mb-2">
+                  Diensten
+                </p>
+                <div className="grid grid-cols-1 gap-2 pl-2">
+                  {Object.values(servicesData).map((svc) => (
+                    <button
+                      key={svc.slug}
+                      onClick={() => navigate(svc.path)}
+                      className="text-left py-1 text-xs font-light text-zinc-700 hover:text-black flex items-center justify-between"
+                    >
+                      <span>{svc.title}</span>
+                      <ChevronRight size={12} className="text-[#B19A78]" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t border-black/5 pt-3 space-y-2">
+                <button
+                  onClick={() => {
+                    navigate('/');
+                    setTimeout(() => {
+                      document.getElementById('feeds-showcase')?.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                  }}
+                  className="w-full text-left text-sm font-light text-zinc-800 py-1"
+                >
+                  Portfolio
+                </button>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setIsContactOpen(true);
+                  }}
+                  className="w-full text-left text-sm font-light text-zinc-800 py-1"
+                >
+                  Contact
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Conditionally Render Dedicated Service Subpage or Full Homepage */}
+      {isServiceRoute && activeService ? (
+        <main className="pt-20">
+          <ServicePage
+            service={activeService}
+            onNavigate={navigate}
+            onOpenContact={(srv) => {
+              setSelectedService(srv || activeService.title);
+              setIsContactOpen(true);
+            }}
+          />
+        </main>
+      ) : (
+        <main>
+          {/* Hero Section - Full screen Background Photo */}
       <header id="hero-section" className="relative min-h-screen w-full flex flex-col items-center justify-between overflow-hidden pt-24 md:pt-28 pb-8">
         {/* Full screen Background Image */}
         <div className="absolute inset-0 w-full h-full z-0">
@@ -208,20 +500,8 @@ export default function App() {
 
         {/* Content Layered on Top */}
         <div className="relative z-10 max-w-6xl w-full px-6 md:px-12 text-center flex flex-col items-center my-auto py-6">
-          {/* Elegant top badge */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-4 md:mb-6 px-4 w-full flex justify-center"
-          >
-            <span className="text-[8px] sm:text-xs font-bold tracking-[0.15em] sm:tracking-[0.4em] text-[#1A1A1A] uppercase bg-white/85 backdrop-blur-md px-3 sm:px-5 py-1.5 sm:py-2 rounded-full border border-white/40 shadow-sm whitespace-nowrap">
-              MARKETING & SOCIAL MEDIA BUREAU
-            </span>
-          </motion.div>
-
           {/* Main Display Typography */}
-          <div className="overflow-hidden mb-3 md:mb-4">
+          <div className="overflow-hidden mb-3">
             <motion.h1 
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
@@ -232,7 +512,21 @@ export default function App() {
             </motion.h1>
           </div>
 
-          <div className="mb-6 md:mb-8 max-w-3xl bg-white/75 backdrop-blur-md px-5 py-6 sm:px-8 sm:py-8 rounded-3xl border border-white/50 shadow-sm">
+          {/* Clean Subtitle Below SO SOCIAL (no background box) */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-5 md:mb-6"
+          >
+            <span className="text-[10px] sm:text-xs font-semibold tracking-[0.28em] sm:tracking-[0.42em] text-[#8F7959] uppercase">
+              MARKETING & SOCIAL MEDIA BUREAU
+            </span>
+          </motion.div>
+
+          <div className="w-16 h-[2px] bg-[#B19A78] rounded-full mb-5 md:mb-6" />
+
+          <div className="mb-6 md:mb-8 max-w-3xl bg-white/80 backdrop-blur-md px-5 py-6 sm:px-8 sm:py-8 rounded-3xl border border-[#B19A78]/30 shadow-sm">
             <div className="overflow-hidden mb-3">
               <motion.p 
                 initial={{ y: "100%" }}
@@ -262,94 +556,49 @@ export default function App() {
           >
             <a 
               href="#services"
-              className="inline-flex items-center gap-3 bg-[#1A1A1A] text-[#EAEAE6] hover:bg-black px-8 py-3.5 rounded-full text-xs font-bold tracking-widest uppercase transition-all shadow-lg hover:scale-102 cursor-pointer"
+              className="inline-flex items-center gap-3 bg-[#B19A78] text-white hover:bg-[#9E8766] px-8 py-3.5 rounded-full text-xs font-bold tracking-widest uppercase transition-all shadow-lg hover:scale-102 cursor-pointer"
             >
               Onze Expertise <ArrowRight size={14} />
             </a>
             
             <button 
               onClick={() => setIsContactOpen(true)}
-              className="inline-flex items-center gap-2 bg-white/80 hover:bg-white text-[#1A1A1A] border border-black/5 px-8 py-3.5 rounded-full text-xs font-bold tracking-widest uppercase transition-all shadow-sm hover:scale-102 cursor-pointer"
+              className="inline-flex items-center gap-2 bg-white/85 hover:bg-white text-[#1A1A1A] border border-[#B19A78]/45 px-8 py-3.5 rounded-full text-xs font-bold tracking-widest uppercase transition-all shadow-sm hover:scale-102 cursor-pointer"
             >
               Samenwerken
             </button>
           </motion.div>
         </div>
-
-        {/* Scroll Indicator */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.6 }}
-          transition={{ delay: 1, duration: 1 }}
-          className="relative z-10 flex flex-col items-center gap-1.5 text-[9px] tracking-[0.3em] uppercase opacity-60 mt-4"
-        >
-          <span className="font-semibold text-black">Scroll om te ontdekken</span>
-          <motion.div 
-            animate={{ y: [0, 5, 0] }}
-            transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-            className="w-1.5 h-3.5 rounded-full bg-black"
-          />
-        </motion.div>
       </header>
 
-      {/* Intro / About Section */}
-      <section id="about" className="scroll-mt-20 md:scroll-mt-28 py-24 md:py-32 px-6 md:px-12 bg-white flex items-center justify-center border-b border-black/5">
-        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-20 items-center">
-          
-          {/* Left Column: Portrait */}
-          <div className="md:col-span-5 flex justify-center md:justify-start">
-            <motion.div 
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="relative w-[280px] h-[370px] sm:w-[320px] sm:h-[420px] rounded-t-full overflow-hidden shadow-2xl border border-black/5 bg-[#EAEAE6]"
-            >
-              <img 
-                src={lopen} 
-                alt="Chinouk Jacobi - Founder & Creative Director of SO SOCIAL" 
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
-            </motion.div>
-          </div>
-
-          {/* Right Column: Narrative */}
-          <div className="md:col-span-7 flex flex-col justify-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, delay: 0.1, ease: "easeOut" }}
-            >
-              <span className="text-[10px] font-bold tracking-[0.3em] text-black/50 uppercase block mb-3">CREATIEF DIRECTEUR</span>
-              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#1A1A1A] mb-6 leading-tight">
-                "Wij vangen de ware essentie van jouw merk in pure digitale esthetiek"
-              </h2>
-              
-              <div className="space-y-4 text-sm sm:text-base text-black/70 font-light leading-relaxed">
-                <p>
-                  Mijn naam is <strong>Chinouk Jacobi</strong>, de oprichter van SO SOCIAL (ook wel bekend als So Social Media). Sinds de oprichting in 2024 geloven we dat social media niet louter functioneel moet zijn; het is de belangrijkste digitale etalage van jouw merk en moet de bezoeker direct betoveren.
-                </p>
-                <p>
-                  Wij ontzorgen commerciële bedrijven, overheden en spraakmakende evenementen volledig. Of het nu gaat om strategische city marketing (waarbij we lokale trots, stedelijke initiatieven en campagnes online en offline vormgeven), het ontwerpen van opvallende posters en PR voor regio-events, of het cureren van een oogstrelende, consistente Instagram-feed voor alle ambitieuze ondernemingen; wij brengen visuele klasse samen met een resultaatgerichte digitale groeistrategie.
-                </p>
-              </div>
-
-              {/* Founder quote signature */}
-              <div className="mt-8 pt-6 border-t border-black/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="font-serif text-lg font-semibold italic text-[#1A1A1A]">
-                  Chinouk Jacobi
-                </div>
-                <div className="text-[10px] font-bold tracking-widest uppercase text-black/50 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse shrink-0" />
-                  <span>Allround Marketing & Communicatie</span>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-
+      {/* General Intro Section */}
+      <section id="intro" className="scroll-mt-20 md:scroll-mt-28 py-24 md:py-32 px-6 md:px-12 bg-[#FAF9F5] flex items-center justify-center border-y border-[#E2DFD8]">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+          >
+            <span className="text-[10px] sm:text-xs font-bold tracking-[0.3em] text-[#B19A78] uppercase block mb-4">
+              KLAAR OM JE TE ONDERSCHEIDEN?
+            </span>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal tracking-tight text-zinc-900 mb-8 leading-[1.15]">
+              Een krachtig{' '}
+              <span className="font-serif italic font-normal text-[#B19A78]">
+                online visitekaartje,
+              </span>{' '}
+              zonder dat je er omkijken naar hebt.
+            </h2>
+            <div className="space-y-5 text-sm sm:text-base md:text-lg text-black/70 font-light leading-relaxed max-w-3xl mx-auto">
+              <p>
+                Wij helpen je met het beheer en de marketing van jouw socials, van contentcreatie tot planning en strategie. We nemen het volledige proces uit handen en zorgen ervoor dat jouw socialmediakanalen een krachtig online visitekaartje zijn.
+              </p>
+              <p>
+                Of je nu meer zichtbaarheid wilt voor je bedrijf of simpelweg je social media op de juiste manier wilt beheren, dit is hét moment om door te pakken.
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -360,7 +609,7 @@ export default function App() {
           {/* Header Row */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 md:mb-24 gap-4">
             <div>
-              <span className="text-[10px] font-bold tracking-[0.3em] text-black/50 uppercase block mb-3">EXPERTISE</span>
+              <span className="text-[10px] font-bold tracking-[0.3em] text-[#B19A78] uppercase block mb-3">EXPERTISE</span>
               <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl tracking-tight text-[#1A1A1A]">
                 Onze Diensten
               </h2>
@@ -373,14 +622,15 @@ export default function App() {
           {/* Services Grid with Custom Interactive Hover Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-6 xl:gap-8">
             
-            {/* Service 1 */}
+            {/* Service 1: Social Media Management */}
             <motion.div 
               id="service-card-1"
+              onClick={() => navigate('/diensten/social-media-management')}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="group flex flex-col h-full bg-white/80 rounded-2xl p-6 xl:p-8 border border-black/5 hover:shadow-xl hover:bg-white transition-all duration-500"
+              className="group flex flex-col h-full bg-white/80 rounded-2xl p-6 xl:p-8 border border-black/5 hover:shadow-xl hover:bg-white transition-all duration-500 cursor-pointer"
             >
               <div className="relative aspect-[3/4] rounded-xl overflow-hidden mb-6 bg-[#EAEAE6]">
                 <img 
@@ -395,39 +645,27 @@ export default function App() {
               </div>
               <h3 className="font-serif text-xl sm:text-2xl lg:text-xl xl:text-2xl mb-4 text-[#1A1A1A] group-hover:text-black flex items-center justify-between">
                 Social Media Management
-                <ArrowRight size={20} className="opacity-0 -translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 flex-shrink-0" />
+                <ArrowRight size={20} className="opacity-0 -translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 flex-shrink-0 text-[#B19A78]" />
               </h3>
-              <p className="text-sm md:text-base text-black/70 font-light leading-relaxed mb-6 flex-grow">
-                Volledige ontzorging van jouw social media kanalen. Van een doordachte contentstrategie en esthetische grid-planning tot copywriting, publicatie en community engagement. Wij zorgen voor een feed die klopt bij jouw merkidentiteit en loyale klanten aantrekt.
+              <p className="text-sm md:text-base text-black/70 font-light leading-relaxed flex-grow">
+                Volledige ontzorging van jouw social media kanalen. Van een doordachte contentstrategie en esthetische grid-planning tot copywriting, publicatie en community engagement.
               </p>
-              
-              {/* Premium list items */}
-              <div className="border-t border-black/10 pt-4 space-y-2 text-xs font-medium tracking-wide text-black/60">
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> Strategie & Visuele Grid-Planning
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> Copywriting & Hashtag Strategie
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> Community Management & Interactie
-                </div>
-              </div>
             </motion.div>
 
-            {/* Service 2 */}
+            {/* Service 2: Fotografie */}
             <motion.div 
               id="service-card-2"
+              onClick={() => navigate('/diensten/fotografie')}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
-              className="group flex flex-col h-full bg-white/80 rounded-2xl p-6 xl:p-8 border border-black/5 hover:shadow-xl hover:bg-white transition-all duration-500"
+              className="group flex flex-col h-full bg-white/80 rounded-2xl p-6 xl:p-8 border border-black/5 hover:shadow-xl hover:bg-white transition-all duration-500 cursor-pointer"
             >
               <div className="relative aspect-[3/4] rounded-xl overflow-hidden mb-6 bg-[#EAEAE6]">
                 <img 
                   src={businessCardSoSocial} 
-                  alt="High-End Content Creatie - SO SOCIAL Visitekaartje" 
+                  alt="Fotografie - SO SOCIAL" 
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-in-out"
                 />
@@ -436,85 +674,28 @@ export default function App() {
                 </div>
               </div>
               <h3 className="font-serif text-xl sm:text-2xl lg:text-xl xl:text-2xl mb-4 text-[#1A1A1A] group-hover:text-black flex items-center justify-between">
-                Content Creatie
-                <ArrowRight size={20} className="opacity-0 -translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 flex-shrink-0" />
+                Fotografie
+                <ArrowRight size={20} className="opacity-0 -translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 flex-shrink-0 text-[#B19A78]" />
               </h3>
-              <p className="text-sm md:text-base text-black/70 font-light leading-relaxed mb-6 flex-grow">
-                Scroll-stoppende visuals die de aandacht direct grijpen. Wij produceren professionele merkfotografie, esthetische sfeervideo's en dynamische short-form video's (Reels & TikToks) die perfect passen bij jouw merkbeleving en viraal potentieel benutten.
+              <p className="text-sm md:text-base text-black/70 font-light leading-relaxed flex-grow">
+                Scroll-stoppende beelden die de aandacht direct grijpen. Wij verzorgen professionele merkfotografie, sfeerbeelden, bedrijfs- en productfotografie die perfect aansluiten bij jouw huisstijl.
               </p>
-              
-              {/* Premium list items */}
-              <div className="border-t border-black/10 pt-4 space-y-2 text-xs font-medium tracking-wide text-black/60">
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> Reels & TikTok Videoproductie
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> Professionele Brandfotografie
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> Visitekaartjes, Posters & Huisstijl
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> Trendbewuste Visual Storytelling
-                </div>
-              </div>
             </motion.div>
 
-            {/* Service 3 */}
+            {/* Service 3: Webdesign */}
             <motion.div 
               id="service-card-3"
+              onClick={() => navigate('/diensten/webdesign')}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-              className="group flex flex-col h-full bg-white/80 rounded-2xl p-6 xl:p-8 border border-black/5 hover:shadow-xl hover:bg-white transition-all duration-500"
-            >
-              <div className="relative aspect-[3/4] rounded-xl overflow-hidden mb-6 bg-[#EAEAE6]">
-                <img 
-                  src={laptopSoSocial} 
-                  alt="PR & Event Branding - SO SOCIAL Laptop" 
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-in-out"
-                />
-                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-sm">
-                  <Layers size={18} className="text-[#1A1A1A]" />
-                </div>
-              </div>
-              <h3 className="font-serif text-xl sm:text-2xl lg:text-xl xl:text-2xl mb-4 text-[#1A1A1A] group-hover:text-black flex items-center justify-between">
-                PR & City Marketing
-                <ArrowRight size={20} className="opacity-0 -translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 flex-shrink-0" />
-              </h3>
-              <p className="text-sm md:text-base text-black/70 font-light leading-relaxed mb-6 flex-grow">
-                Wij zetten jouw evenement, onderneming of regio op de kaart. Met strategische city marketing bouwen we aan stadsbetrokkenheid en online herkenbaarheid. Van opvallende fysieke en digitale posters tot complete regiocampagnes en commerciële PR.
-              </p>
-              
-              {/* Premium list items */}
-              <div className="border-t border-black/10 pt-4 space-y-2 text-xs font-medium tracking-wide text-black/60">
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> City- & Regiomarketing
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> Poster & Flyer Designs (Fysiek & Digitaal)
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> Commerciële B2B & Retail PR Campagnes
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Service 4: Webdesign, Development & Onderhoud */}
-            <motion.div 
-              id="service-card-4"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, delay: 0.45, ease: "easeOut" }}
-              className="group flex flex-col h-full bg-white/80 rounded-2xl p-6 xl:p-8 border border-black/5 hover:shadow-xl hover:bg-white transition-all duration-500"
+              className="group flex flex-col h-full bg-white/80 rounded-2xl p-6 xl:p-8 border border-black/5 hover:shadow-xl hover:bg-white transition-all duration-500 cursor-pointer"
             >
               <div className="relative aspect-[3/4] rounded-xl overflow-hidden mb-6 bg-[#EAEAE6]">
                 <img 
                   src={laptopWerk} 
-                  alt="Webdesign & Development - SO SOCIAL" 
+                  alt="Webdesign - SO SOCIAL" 
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-in-out"
                 />
@@ -523,34 +704,49 @@ export default function App() {
                 </div>
               </div>
               <h3 className="font-serif text-xl sm:text-2xl lg:text-xl xl:text-2xl mb-4 text-[#1A1A1A] group-hover:text-black flex items-center justify-between">
-                Webdesign & Development
-                <ArrowRight size={20} className="opacity-0 -translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 flex-shrink-0" />
+                Webdesign
+                <ArrowRight size={20} className="opacity-0 -translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 flex-shrink-0 text-[#B19A78]" />
               </h3>
-              <p className="text-sm md:text-base text-black/70 font-light leading-relaxed mb-6 flex-grow">
-                Een op maat gemaakte, conversiegerichte website die jouw merkidentiteit ademt. Van doordacht maatwerk webdesign en snelle mobiele webdevelopment tot betrouwbaar periodiek onderhoud, hosting, veiligheidsback-ups en software-updates.
+              <p className="text-sm md:text-base text-black/70 font-light leading-relaxed flex-grow">
+                Een op maat gemaakte, conversiegerichte website die jouw merkidentiteit ademt. Van doordacht maatwerk webdesign en snelle mobiele ontwikkeling tot betrouwbaar onderhoud en updates.
               </p>
-              
-              {/* Premium list items */}
-              <div className="border-t border-black/10 pt-4 space-y-2 text-xs font-medium tracking-wide text-black/60">
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> Maatwerk Webdesign & Ontwerp
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> Snelle, Mobielvriendelijke Development
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> Periodiek Onderhoud & Software-updates
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-emerald-600 flex-shrink-0" /> Hosting, SSL-beveiliging & Back-ups
+            </motion.div>
+
+            {/* Service 4: Marketing Management */}
+            <motion.div 
+              id="service-card-4"
+              onClick={() => navigate('/diensten/marketing-management')}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, delay: 0.45, ease: "easeOut" }}
+              className="group flex flex-col h-full bg-white/80 rounded-2xl p-6 xl:p-8 border border-black/5 hover:shadow-xl hover:bg-white transition-all duration-500 cursor-pointer"
+            >
+              <div className="relative aspect-[3/4] rounded-xl overflow-hidden mb-6 bg-[#EAEAE6]">
+                <img 
+                  src={laptopSoSocial} 
+                  alt="Marketing Management - SO SOCIAL" 
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-in-out"
+                />
+                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-sm">
+                  <Layers size={18} className="text-[#1A1A1A]" />
                 </div>
               </div>
+              <h3 className="font-serif text-xl sm:text-2xl lg:text-xl xl:text-2xl mb-4 text-[#1A1A1A] group-hover:text-black flex items-center justify-between">
+                Marketing Management
+                <ArrowRight size={20} className="opacity-0 -translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 flex-shrink-0 text-[#B19A78]" />
+              </h3>
+              <p className="text-sm md:text-base text-black/70 font-light leading-relaxed flex-grow">
+                Wij zetten jouw onderneming, evenement of regio krachtig op de kaart. Met strategisch marketing management combineren we online campagnes, PR, city marketing en merkpositionering voor blijvende groei.
+              </p>
             </motion.div>
 
           </div>
 
+
           {/* Quick CTA banner */}
-          <div className="mt-16 text-center">
+          <div className="mt-12 text-center">
             <button 
               onClick={() => setIsContactOpen(true)}
               className="inline-flex items-center gap-3 bg-[#1A1A1A] text-white px-8 py-4 rounded-full text-sm font-semibold tracking-widest uppercase hover:bg-black/90 hover:scale-102 transition-all shadow-lg cursor-pointer"
@@ -562,164 +758,9 @@ export default function App() {
         </div>
       </section>
 
-      {/* NEW: Interactive Strategy & Campaign Planner Section */}
-      <section id="planner" className="scroll-mt-20 md:scroll-mt-28 py-24 md:py-32 px-6 md:px-12 bg-white border-t border-b border-black/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-[10px] font-bold tracking-[0.3em] text-black/50 uppercase block mb-3">SOCIAL PLANNING TOOL</span>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#1A1A1A] mb-4">
-              Ontwerp Jouw Social Plan
-            </h2>
-            <p className="text-sm text-black/60 font-light leading-relaxed">
-              Gebruik onze interactieve planner om de ideale strategie en kanaalverdeling te berekenen op basis van jouw specifieke marketingdoelen.
-            </p>
-          </div>
+      {/* Feeds Showcase Section (EVEN GLUREN - Een paar feeds die we maakten) */}
+      <FeedShowcase />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
-            
-            {/* Left Box: Controls */}
-            <div className="lg:col-span-6 bg-[#EAEAE6]/50 rounded-3xl p-6 sm:p-8 border border-black/5 flex flex-col justify-between">
-              <div>
-                {/* Select Goal */}
-                <div className="mb-4">
-                  <label className="block text-xs font-bold tracking-wider uppercase text-black/70 mb-4">
-                    Wat is jouw belangrijkste doel?
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {[
-                      'Esthetische Instagram Feed',
-                      'Commerciële Leads & Groei',
-                      'City Marketing & PR',
-                      'Merkbekendheid & Bereik'
-                    ].map((g) => (
-                      <button
-                        key={g}
-                        onClick={() => setPlannerGoal(g)}
-                        className={`text-left p-4 rounded-xl border text-xs font-medium tracking-wide transition-all cursor-pointer ${
-                          plannerGoal === g
-                            ? 'bg-[#1A1A1A] text-white border-transparent shadow-md'
-                            : 'bg-white border-black/5 hover:bg-white/80'
-                        }`}
-                      >
-                        {g}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-black/10 text-xs text-black/50 font-light">
-                * Onze tarieven worden altijd volledig afgestemd op jouw specifieke wensen en de omvang van jouw onderneming.
-              </div>
-            </div>
-
-            {/* Right Box: Dynamic Results */}
-            <div className="lg:col-span-6 bg-[#111111] text-[#EAEAE6] rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/2 rounded-full blur-2xl pointer-events-none" />
-              
-              <div>
-                <span className="text-[9px] font-bold tracking-[0.3em] text-white/40 uppercase block mb-2">ANALYSE & ADVIES</span>
-                <h3 className="font-serif text-2xl font-bold mb-6 text-[#EAEAE6] flex items-center gap-2">
-                  Gepersonaliseerde Aanpak <Sparkles size={18} />
-                </h3>
-
-                {/* Strategy Text */}
-                <div className="mb-6">
-                  <p className="text-xs sm:text-sm text-white/80 font-light leading-relaxed bg-white/5 p-4 rounded-xl border border-white/5">
-                    {plannerGoal === 'Esthetische Instagram Feed' && 'De focus ligt op het transformeren van jouw Instagram-feed tot een hoogwaardig digitaal magazine. We ontwerpen een herkenbaar kleurenpalet en een consistent grid-ontwerp om direct vertrouwen en autoriteit te wekken.'}
-                    {plannerGoal === 'Commerciële Leads & Groei' && 'Voor commerciële bedrijven zetten we in op prestatiegerichte funnels, esthetische B2B/Retail advertenties en actieve community building om volgers om te zetten in loyale, betalende klanten.'}
-                    {plannerGoal === 'City Marketing & PR' && 'Strategische regiomarketing en event buzz. We combineren de herkenbare offline and online uitingen van stadsmarketing met opvallende fysieke en digitale posters.'}
-                    {plannerGoal === 'Merkbekendheid & Bereik' && 'Haal het maximale uit short-form video. Wij bedenken scroll-stoppende video-concepten, schrijven de scripts, en bewerken de beelden professioneel om viraal bereik en maximale online herkenbaarheid te realiseren.'}
-                  </p>
-                </div>
-
-                {/* Key specs */}
-                <div className="space-y-4 mb-8">
-                  <div>
-                    <span className="text-[10px] text-white/40 block uppercase tracking-wider mb-1">Aanbevolen Frequentie</span>
-                    <span className="text-xs sm:text-sm font-semibold block text-white">
-                      {plannerGoal === 'Esthetische Instagram Feed' && '1-3 posts p/w + wekelijkse grid curatie & planning'}
-                      {plannerGoal === 'Commerciële Leads & Groei' && '1-3 posts p/w + dagelijkse high-converting Stories & lead funnels'}
-                      {plannerGoal === 'City Marketing & PR' && '1-3 posts p/w + fysieke & digitale postercampagne & PR'}
-                      {plannerGoal === 'Merkbekendheid & Bereik' && '1-3 posts p/w + professionele high-end video-editing'}
-                    </span>
-                  </div>
-                  
-                  <div>
-                    <span className="text-[10px] text-white/40 block uppercase tracking-wider mb-1">Verwacht Effect</span>
-                    <span className="text-xs sm:text-sm font-semibold block text-[#EAEAE6] flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                      {plannerGoal === 'Esthetische Instagram Feed' && 'Consistente, premium uitstraling, stijging in merkkrediet'}
-                      {plannerGoal === 'Commerciële Leads & Groei' && 'Meetbare toename in leads, hogere website conversie & actieve merkfans'}
-                      {plannerGoal === 'City Marketing & PR' && 'Grootschalige lokale & regionale buzz, maximale stadsbetrokkenheid & drukbezochte locaties'}
-                      {plannerGoal === 'Merkbekendheid & Bereik' && '75.000+ organische weergaven per maand & viraal potentieel'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Bar breakdown */}
-                <div className="space-y-3 mb-8">
-                  <span className="text-[9px] text-white/40 block uppercase tracking-wider">Strategische Kanaalverdeling</span>
-                  
-                  {/* Instagram */}
-                  <div>
-                    <div className="flex justify-between text-[10px] text-white/70 mb-1">
-                      <span>Instagram & Feed Aesthetic</span>
-                      <span>{plannerGoal === 'Esthetische Instagram Feed' ? '95%' : plannerGoal === 'Commerciële Leads & Groei' ? '80%' : plannerGoal === 'City Marketing & PR' ? '55%' : '70%'}</span>
-                    </div>
-                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-[#EAEAE6] rounded-full transition-all duration-500" 
-                        style={{ width: plannerGoal === 'Esthetische Instagram Feed' ? '95%' : plannerGoal === 'Commerciële Leads & Groei' ? '80%' : plannerGoal === 'City Marketing & PR' ? '55%' : '70%' }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Short-Form Video */}
-                  <div>
-                    <div className="flex justify-between text-[10px] text-white/70 mb-1">
-                      <span>Reels & TikTok (Short-Form)</span>
-                      <span>{plannerGoal === 'Esthetische Instagram Feed' ? '25%' : plannerGoal === 'Commerciële Leads & Groei' ? '75%' : plannerGoal === 'City Marketing & PR' ? '45%' : '90%'}</span>
-                    </div>
-                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-[#EAEAE6] rounded-full transition-all duration-500" 
-                        style={{ width: plannerGoal === 'Esthetische Instagram Feed' ? '25%' : plannerGoal === 'Commerciële Leads & Groei' ? '75%' : plannerGoal === 'City Marketing & PR' ? '45%' : '90%' }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* PR / Posters */}
-                  <div>
-                    <div className="flex justify-between text-[10px] text-white/70 mb-1">
-                      <span>Fysieke & Digitale PR / Poster Campagnes</span>
-                      <span>{plannerGoal === 'Esthetische Instagram Feed' ? '10%' : plannerGoal === 'Commerciële Leads & Groei' ? '20%' : plannerGoal === 'City Marketing & PR' ? '95%' : '10%'}</span>
-                    </div>
-                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-[#EAEAE6] rounded-full transition-all duration-500" 
-                        style={{ width: plannerGoal === 'Esthetische Instagram Feed' ? '10%' : plannerGoal === 'Commerciële Leads & Groei' ? '20%' : plannerGoal === 'City Marketing & PR' ? '95%' : '10%' }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action */}
-              <button
-                onClick={() => {
-                  setSelectedService(plannerGoal);
-                  setIsContactOpen(true);
-                }}
-                className="w-full bg-[#EAEAE6] hover:bg-[#F5F5F2] text-black py-4 rounded-xl text-xs font-bold tracking-widest uppercase transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer mt-4"
-              >
-                Dit Plan Vrijblijvend Bespreken <Send size={14} />
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </section>
 
       {/* Portfolio / Selected Work Section */}
       <section id="portfolio" className="scroll-mt-20 md:scroll-mt-28 py-24 md:py-36 px-6 md:px-12 bg-[#EAEAE6]">
@@ -728,7 +769,7 @@ export default function App() {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 md:mb-24 gap-4">
             <div>
-              <span className="text-[10px] font-bold tracking-[0.3em] text-black/50 uppercase block mb-3">CURATIE</span>
+              <span className="text-[10px] font-bold tracking-[0.3em] text-[#B19A78] uppercase block mb-3">CURATIE</span>
               <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl tracking-tight text-[#1A1A1A]">
                 Selected Work
               </h2>
@@ -903,6 +944,33 @@ export default function App() {
               </div>
             </motion.div>
 
+            {/* Project: Grand Café Jules (Social Media Management) */}
+            <motion.div 
+              id="portfolio-item-jules"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-white"
+            >
+              <img 
+                src="/assets/aistudio/WhatsApp_Image_2026-11-18_at_16.29.59_4c8e58d5.jpeg" 
+                alt="Social Media Management - Grand Café Jules" 
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover filter grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-all duration-500 group-hover:opacity-90" />
+              
+              {/* Overlay details */}
+              <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white flex flex-col gap-2">
+                <span className="text-[9px] md:text-xs font-semibold tracking-[0.2em] text-white/70 uppercase">SOCIAL MEDIA MANAGEMENT</span>
+                <h3 className="font-serif text-2xl md:text-3xl font-bold tracking-tight">Grand Café Jules</h3>
+                <p className="text-xs md:text-sm text-white/80 font-light max-w-md hidden sm:block">
+                  Sfeervolle fotografie, warme culinaire storytelling en een consistente Instagram-feed die de gastvrijheid en ambiance van Grand Café Jules direct tot leven brengen.
+                </p>
+              </div>
+            </motion.div>
+
             {/* Project 5: Voetbalvereniging Rood Groen LVC'01 */}
             <motion.div 
               id="portfolio-item-5"
@@ -910,24 +978,22 @@ export default function App() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="col-span-12 group relative overflow-hidden rounded-2xl min-h-[400px] md:h-[500px] shadow-lg bg-white grid grid-cols-1 md:grid-cols-12"
+              className="col-span-12 md:col-span-6 group relative overflow-hidden rounded-2xl h-[400px] md:h-[500px] shadow-lg bg-white"
             >
-              {/* Left Column: Image */}
-              <div className="md:col-span-5 h-[250px] md:h-full relative overflow-hidden bg-[#EAEAE6]">
-                <img 
-                  src={heroWidescreen} 
-                  alt="Rood Groen LVC'01 — Social Media Partner" 
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover filter grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105"
-                />
-              </div>
-
-              {/* Right Column: Text Content */}
-              <div className="md:col-span-7 p-8 md:p-12 flex flex-col justify-center bg-[#1A1A1A] text-white">
-                <span className="text-[10px] md:text-xs font-semibold tracking-[0.2em] text-[#4ade80] uppercase mb-3 block">SOCIAL MEDIA PARTNER</span>
-                <h3 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight mb-4 text-white">Rood Groen LVC'01</h3>
-                <p className="text-xs sm:text-sm md:text-base text-white/80 font-light leading-relaxed max-w-xl">
-                  Als trotse social media partner verzorgen en versterken we de online aanwezigheid van voetbalvereniging Rood Groen LVC'01 uit Vaals & Lemiers. Van dynamische wedstrijdverslagen tot sprankelende community-updates die de clubgeest digitaal vertalen.
+              <img 
+                src={heroWidescreen} 
+                alt="Rood Groen LVC'01 — Social Media Partner" 
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover filter grayscale contrast-[1.05] brightness-[0.92] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-all duration-500 group-hover:opacity-90" />
+              
+              {/* Overlay details */}
+              <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white flex flex-col gap-2">
+                <span className="text-[9px] md:text-xs font-semibold tracking-[0.2em] text-white/70 uppercase">SOCIAL MEDIA PARTNER</span>
+                <h3 className="font-serif text-2xl md:text-3xl font-bold tracking-tight">Rood Groen LVC'01</h3>
+                <p className="text-xs md:text-sm text-white/80 font-light max-w-md hidden sm:block">
+                  Als trotse social media partner verzorgen en versterken we de online aanwezigheid van voetbalvereniging Rood Groen LVC'01 uit Vaals & Lemiers.
                 </p>
               </div>
             </motion.div>
@@ -946,9 +1012,9 @@ export default function App() {
           
           {/* Header */}
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-[10px] font-bold tracking-[0.3em] text-black/50 uppercase block mb-3">RECENSIES</span>
+            <span className="text-[10px] font-bold tracking-[0.3em] text-[#B19A78] uppercase block mb-3">RECENSIES</span>
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#1A1A1A] mb-4">
-              Wat Onze Klanten Zeggen
+              Wat Onze <span className="text-[#B19A78]">Opdrachtgevers</span> Zeggen
             </h2>
             <p className="text-sm text-black/60 font-light leading-relaxed">
               Wij bouwen aan langdurige partnerschappen gebaseerd op visuele perfectie en tastbaar resultaat.
@@ -966,18 +1032,10 @@ export default function App() {
               className="bg-[#EAEAE6]/20 rounded-3xl p-8 border border-black/5 flex flex-col justify-between hover:bg-[#EAEAE6]/35 transition-all duration-300"
             >
               <div>
-                <div className="flex justify-between items-start mb-6">
-                  <div className="w-16 h-16 rounded-full overflow-hidden border border-black/10 bg-white p-1 flex items-center justify-center shadow-sm">
-                    <img 
-                      src={grensulleLogo} 
-                      alt="CV de Grensülle Vols logo" 
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-contain rounded-full"
-                    />
-                  </div>
+                <div className="flex justify-end items-center mb-6">
                   <div className="flex gap-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} className="fill-[#8E8E8A] text-[#8E8E8A]" />
+                      <Star key={i} size={14} className="fill-[#B19A78] text-[#B19A78]" />
                     ))}
                   </div>
                 </div>
@@ -1006,13 +1064,10 @@ export default function App() {
               className="bg-[#EAEAE6]/20 rounded-3xl p-8 border border-black/5 flex flex-col justify-between hover:bg-[#EAEAE6]/35 transition-all duration-300"
             >
               <div>
-                <div className="flex justify-between items-start mb-6">
-                  <div className="p-3 bg-white rounded-full border border-black/10 flex items-center justify-center shadow-sm w-12 h-12">
-                    <Award size={20} className="text-[#1A1A1A]" />
-                  </div>
+                <div className="flex justify-end items-center mb-6">
                   <div className="flex gap-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} className="fill-[#8E8E8A] text-[#8E8E8A]" />
+                      <Star key={i} size={14} className="fill-[#B19A78] text-[#B19A78]" />
                     ))}
                   </div>
                 </div>
@@ -1041,13 +1096,10 @@ export default function App() {
               className="bg-[#EAEAE6]/20 rounded-3xl p-8 border border-black/5 flex flex-col justify-between hover:bg-[#EAEAE6]/35 transition-all duration-300"
             >
               <div>
-                <div className="flex justify-between items-start mb-6">
-                  <div className="p-3 bg-white rounded-full border border-black/10 flex items-center justify-center shadow-sm w-12 h-12">
-                    <MessageSquare size={20} className="text-[#1A1A1A]" />
-                  </div>
+                <div className="flex justify-end items-center mb-6">
                   <div className="flex gap-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} className="fill-[#8E8E8A] text-[#8E8E8A]" />
+                      <Star key={i} size={14} className="fill-[#B19A78] text-[#B19A78]" />
                     ))}
                   </div>
                 </div>
@@ -1076,13 +1128,10 @@ export default function App() {
               className="bg-[#EAEAE6]/20 rounded-3xl p-8 border border-black/5 flex flex-col justify-between hover:bg-[#EAEAE6]/35 transition-all duration-300"
             >
               <div>
-                <div className="flex justify-between items-start mb-6">
-                  <div className="p-3 bg-white rounded-full border border-black/10 flex items-center justify-center shadow-sm w-12 h-12">
-                    <Sparkles size={20} className="text-[#1A1A1A]" />
-                  </div>
+                <div className="flex justify-end items-center mb-6">
                   <div className="flex gap-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} className="fill-[#8E8E8A] text-[#8E8E8A]" />
+                      <Star key={i} size={14} className="fill-[#B19A78] text-[#B19A78]" />
                     ))}
                   </div>
                 </div>
@@ -1107,136 +1156,69 @@ export default function App() {
         </div>
       </section>
 
-      {/* Team & Open Sollicitatie Section */}
-      <section id="team" className="scroll-mt-20 md:scroll-mt-28 py-24 md:py-32 px-6 md:px-12 bg-[#EAEAE6] border-t border-black/5">
-        <div className="max-w-7xl mx-auto">
+      {/* Personal Intro / About Section (Right before Get in Touch) */}
+      <section id="about" className="scroll-mt-20 md:scroll-mt-28 py-24 md:py-32 px-6 md:px-12 bg-[#EAEAE6]/40 flex items-center justify-center border-t border-black/5">
+        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-20 items-center">
           
-          {/* Header */}
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-[10px] font-bold tracking-[0.3em] text-black/50 uppercase block mb-3">ONTMOET ONS</span>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#1A1A1A] mb-4">
-              Het Team Achter SO SOCIAL
-            </h2>
-            <p className="text-sm text-black/60 font-light leading-relaxed">
-              Wij combineren creatieve bezieling, strakke planning en strategische scherpte om jouw merk online en offline te laten domineren.
-            </p>
+          {/* Left Column: Portrait */}
+          <div className="md:col-span-5 flex justify-center md:justify-start">
+            <motion.div 
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="relative w-[280px] h-[370px] sm:w-[320px] sm:h-[420px] rounded-t-full overflow-hidden shadow-2xl border border-black/5 bg-[#EAEAE6]"
+            >
+              <img 
+                src={lopen} 
+                alt="Chinouk Jacobi - Founder & Creative Director of SO SOCIAL" 
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
+            </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-            
-            {/* Team Member 1: Chinouk */}
-            <motion.div 
-              id="team-chinouk"
-              initial={{ opacity: 0, y: 20 }}
+          {/* Right Column: Narrative */}
+          <div className="md:col-span-7 flex flex-col justify-center">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="bg-white rounded-3xl p-6 border border-black/5 flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-300 group"
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1, delay: 0.1, ease: "easeOut" }}
             >
-              <div>
-                <div className="relative aspect-[4/5] rounded-2xl mb-6 border border-black/10 overflow-hidden bg-[#EAEAE6]">
-                  <img 
-                    src={lopen} 
-                    alt="Chinouk Jacobi - Allround Marketing & Communicatie" 
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <h3 className="font-serif text-xl font-bold text-[#1A1A1A] mb-1">Chinouk Jacobi</h3>
-                <span className="text-[10px] font-bold tracking-widest text-[#8E8E8A] uppercase block mb-3">Allround Marketing & Communicatie</span>
-                <p className="text-xs text-black/60 font-light leading-relaxed">
-                  De drijvende kracht achter de visuele koers en groeistrategieën. Gespecialiseerd in high-end brand identity, social grid curatie en city marketing.
+              <span className="text-[10px] font-bold tracking-[0.3em] text-[#B19A78] uppercase block mb-3">CREATIEF DIRECTEUR</span>
+              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#1A1A1A] mb-6 leading-tight">
+                "Wij vangen de ware essentie van jouw merk in pure digitale esthetiek"
+              </h2>
+              
+              <div className="space-y-4 text-sm sm:text-base text-black/70 font-light leading-relaxed">
+                <p>
+                  Mijn naam is <strong>Chinouk Jacobi</strong>, de oprichter van SO SOCIAL (ook wel bekend als So Social Media). Sinds de oprichting in 2024 geloven we dat social media niet louter functioneel moet zijn; het is de belangrijkste digitale etalage van jouw merk en moet de bezoeker direct betoveren.
+                </p>
+                <p>
+                  Wij ontzorgen commerciële bedrijven, overheden en spraakmakende evenementen volledig. Of het nu gaat om strategische city marketing (waarbij we lokale trots, stedelijke initiatieven en campagnes online en offline vormgeven), het ontwerpen van opvallende posters en PR voor regio-events, of het cureren van een oogstrelende, consistente Instagram-feed voor alle ambitieuze ondernemingen; wij brengen visuele klasse samen met een resultaatgerichte digitale groeistrategie.
                 </p>
               </div>
-              <div className="border-t border-black/5 mt-6 pt-4 flex gap-3">
-                <span className="text-[10px] font-semibold text-black/40">✨ Oprichter & Creatief Directeur</span>
-              </div>
-            </motion.div>
 
-            {/* Team Member 2: John */}
-            <motion.div 
-              id="team-john"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-white rounded-3xl p-6 border border-black/5 flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-300 group"
-            >
-              <div>
-                <div className="relative aspect-[4/5] rounded-2xl mb-6 bg-[#111111] border border-black/10 flex flex-col items-center justify-center overflow-hidden">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,transparent_100%)] pointer-events-none" />
-                  <div className="relative flex flex-col items-center justify-center p-8 text-center">
-                    <span className="font-serif text-5xl md:text-6xl font-bold tracking-tighter text-[#EAEAE6] mb-3 select-none">
-                      SO.
-                    </span>
-                    <span className="text-[10px] font-bold tracking-[0.3em] text-[#EAEAE6]/50 uppercase select-none">
-                      SO SOCIAL
-                    </span>
-                  </div>
-                  {/* Decorative luxury corners */}
-                  <div className="absolute top-4 left-4 w-3 h-3 border-t border-l border-[#EAEAE6]/20" />
-                  <div className="absolute top-4 right-4 w-3 h-3 border-t border-r border-[#EAEAE6]/20" />
-                  <div className="absolute bottom-4 left-4 w-3 h-3 border-b border-l border-[#EAEAE6]/20" />
-                  <div className="absolute bottom-4 right-4 w-3 h-3 border-b border-r border-[#EAEAE6]/20" />
+              {/* Founder quote signature */}
+              <div className="mt-8 pt-6 border-t border-black/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="font-serif text-lg font-semibold italic text-[#1A1A1A]">
+                  Chinouk Jacobi
                 </div>
-                <h3 className="font-serif text-xl font-bold text-[#1A1A1A] mb-1">John Jacobi</h3>
-                <span className="text-[10px] font-bold tracking-widest text-[#8E8E8A] uppercase block mb-3">Administratie & Boekhouding</span>
-                <p className="text-xs text-black/60 font-light leading-relaxed">
-                  Zorgt achter de schermen voor de strakke organisatie, facturatie en vlekkeloze administratieve afhandeling van al onze projecten.
-                </p>
-              </div>
-              <div className="border-t border-black/5 mt-6 pt-4 flex gap-3">
-                <span className="text-[10px] font-semibold text-black/40">💼 Finance & Structuur</span>
-              </div>
-            </motion.div>
-
-            {/* Team Member 3: Open Sollicitatie / Kennismaken */}
-            <motion.div 
-              id="team-chayenne"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-white rounded-3xl p-6 border border-black/5 flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-300 group"
-            >
-              <div>
-                <div className="relative aspect-[4/5] rounded-2xl mb-6 bg-[#EAEAE6] border border-black/10 flex flex-col items-center justify-center overflow-hidden transition-colors group-hover:bg-[#E2E0D8]">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.03)_0%,transparent_100%)] pointer-events-none" />
-                  <div className="relative flex flex-col items-center justify-center p-8 text-center">
-                    <span className="font-serif text-5xl md:text-6xl font-bold tracking-tighter text-[#111111] mb-3 select-none">
-                      SO.
-                    </span>
-                    <span className="text-[10px] font-bold tracking-[0.3em] text-[#111111]/50 uppercase select-none">
-                      SO SOCIAL
-                    </span>
-                  </div>
-                  {/* Decorative luxury corners */}
-                  <div className="absolute top-4 left-4 w-3 h-3 border-t border-l border-black/20" />
-                  <div className="absolute top-4 right-4 w-3 h-3 border-t border-r border-black/20" />
-                  <div className="absolute bottom-4 left-4 w-3 h-3 border-b border-l border-black/20" />
-                  <div className="absolute bottom-4 right-4 w-3 h-3 border-b border-r border-black/20" />
+                <div className="text-[10px] font-bold tracking-widest uppercase text-black/50 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse shrink-0" />
+                  <span>Allround Marketing & Communicatie</span>
                 </div>
-                <h3 className="font-serif text-xl font-bold text-[#1A1A1A] mb-1">Open Sollicitatie</h3>
-                <span className="text-[10px] font-bold tracking-widest text-[#8E8E8A] uppercase block mb-3">Stages & Creatief Talent</span>
-                <p className="text-xs text-black/60 font-light leading-relaxed mb-4">
-                  Ben jij een creatief talent in content creatie, social media management, fotografie of development en wil je meebouwen aan toonaangevende merken? We maken graag tijd voor een goede kop koffie!
-                </p>
-              </div>
-              <div className="border-t border-black/5 mt-6 pt-4">
-                <button 
-                  type="button"
-                  onClick={() => setIsContactOpen(true)}
-                  className="w-full inline-flex items-center justify-between text-xs font-semibold text-[#1A1A1A] group-hover:text-black py-1 cursor-pointer"
-                >
-                  <span className="underline underline-offset-4 decoration-black/20 hover:decoration-black">Stuur een open sollicitatie</span>
-                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                </button>
               </div>
             </motion.div>
-
           </div>
+
         </div>
       </section>
+
+        </main>
+      )}
 
       {/* Interactive Contact Footer */}
       <footer id="contact" className="scroll-mt-20 md:scroll-mt-28 min-h-[70vh] flex flex-col justify-between bg-[#111111] text-[#EAEAE6] px-6 py-12 md:px-12 md:py-20 relative overflow-hidden">
@@ -1246,12 +1228,15 @@ export default function App() {
 
         {/* Top Branding Bar */}
         <div className="flex justify-between items-center border-b border-white/10 pb-8">
-          <div className="flex items-center gap-3 font-serif text-xl font-bold tracking-tight">
-            <div className="w-8 h-8 rounded-lg overflow-hidden border border-white/20 bg-[#E6E4DD]">
-              <img src={soSocialLogo} alt="SO SOCIAL" className="w-full h-full object-contain" />
+          <button 
+            onClick={() => navigate('/')} 
+            className="flex items-center gap-3 font-serif text-xl font-bold tracking-tight text-white hover:opacity-90 transition-opacity cursor-pointer text-left"
+          >
+            <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#B19A78]/40 bg-[#B19A78] flex items-center justify-center">
+              <img src="/assets/aistudio/download_45d5e3ee.png" alt="SO SOCIAL" className="w-full h-full object-cover translate-y-[8%] scale-[2.2]" />
             </div>
             SO SOCIAL
-          </div>
+          </button>
           <div className="flex gap-4">
             <a 
               href="https://www.instagram.com/so.social.media" 
@@ -1423,7 +1408,7 @@ export default function App() {
                     <div>
                       <label className="block text-[10px] font-bold tracking-wider uppercase text-black/60 mb-3">Gewenste Dienst</label>
                       <div className="grid grid-cols-2 gap-2">
-                        {['Social Management', 'Content Creatie', 'PR & City Marketing', 'Webdesign & Development', 'Website Onderhoud'].map((srv) => (
+                        {['Social Media Management', 'Fotografie', 'Webdesign', 'Marketing Management'].map((srv) => (
                           <button
                             key={srv}
                             type="button"
@@ -1453,6 +1438,12 @@ export default function App() {
                         className="w-full bg-white/70 border border-black/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors resize-none"
                       />
                     </div>
+
+                    {formError && (
+                      <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-xs text-red-700">
+                        {formError}
+                      </div>
+                    )}
 
                     {/* Submit Button */}
                     <button
