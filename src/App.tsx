@@ -50,6 +50,7 @@ import visitZuidLimburg from './assets/images/visit_zuid_limburg_1788530238514.j
 import { servicesData, generalFaqs } from './data/servicesData';
 import ServicePage from './components/ServicePage';
 import FeedShowcase from './components/FeedShowcase';
+import VisitekaartjeScrollSection from './components/VisitekaartjeScrollSection';
 import { updatePageSeo } from './utils/seo';
 
 interface Submission {
@@ -544,31 +545,8 @@ export default function App() {
         </div>
       </header>
 
-      {/* General Intro Section */}
-      <section id="intro" className="scroll-mt-20 md:scroll-mt-28 py-24 md:py-32 px-6 md:px-12 bg-[#FAF9F5] flex items-center justify-center border-y border-[#E2DFD8]">
-        <div className="max-w-4xl mx-auto text-center">
-          <div>
-            <span className="text-[10px] sm:text-xs font-bold tracking-[0.3em] text-[#B19A78] uppercase block mb-4">
-              KLAAR OM JE TE ONDERSCHEIDEN?
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal tracking-tight text-zinc-900 mb-8 leading-[1.15]">
-              Een krachtig{' '}
-              <span className="font-serif italic font-normal text-[#B19A78]">
-                online visitekaartje,
-              </span>{' '}
-              zonder dat je er omkijken naar hebt.
-            </h2>
-            <div className="space-y-5 text-sm sm:text-base md:text-lg text-black/70 font-light leading-relaxed max-w-3xl mx-auto">
-              <p>
-                Wij helpen je met het beheer en de marketing van jouw socials, van contentcreatie tot planning en strategie. We nemen het volledige proces uit handen en zorgen ervoor dat jouw socialmediakanalen een krachtig online visitekaartje zijn.
-              </p>
-              <p>
-                Of je nu meer zichtbaarheid wilt voor je bedrijf of simpelweg je social media op de juiste manier wilt beheren, dit is hét moment om door te pakken.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* General Intro Section with Scroll-Driven Graphic Visitekaartje */}
+      <VisitekaartjeScrollSection />
 
       {/* Services / Diensten Section */}
       <section id="services" className="scroll-mt-20 md:scroll-mt-28 py-24 md:py-36 px-6 md:px-12 bg-white/40">
